@@ -75,7 +75,7 @@ class CustomsDeclarationsController @Inject()(logger: DeclarationsLogger,
   def submit(): Action[AnyContent] = validateHeaders().async(bodyParser = xmlOrEmptyBody) {
     implicit request =>
 
-      logger.debug("Request received", payload = request.body.toString)
+      logger.debug(s"Request received payload = ${request.body.toString}")
 
       lazy val maybeAcceptHeader = request.headers.get(ACCEPT)
       request.body.asXml match {

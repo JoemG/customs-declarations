@@ -53,7 +53,7 @@ class CommunicationService @Inject()(logger: DeclarationsLogger,
     val correlationId = uuidService.uuid()
     val dateTime = dateTimeProvider.nowUtc()
 
-    logger.info(s"[conversationId=$conversationId] correlationId=$correlationId, dateTime=$dateTime, requestedApiVersion=$requestedApiVersion")
+    logger.info(s"Generated conversationId=$conversationId correlationId=$correlationId, dateTime=$dateTime, requestedApiVersion=$requestedApiVersion")
 
     for {
       fieldsId <- futureClientId(requestedApiVersion.versionNumber)

@@ -42,9 +42,8 @@ object LoggingHelper {
     s"${format(headers, maybeIds = None)} $msg".trim
   }
 
-  def formatDebug(msg: String, maybePayload: Option[String] = None)(implicit hc: HeaderCarrier): String = {
-    val headers = hc.headers
-    s"${format(headers, maybeIds = None)} $msg\nrequest headers=${overwriteHeaderValues(headers, headersToOverwrite - AUTHORIZATION)} ".trim + maybePayload.fold("")(payload => s"\npayload=$payload")
+  def formatDebug(msg: String)(implicit hc: HeaderCarrier): String = {
+    formatDebug(msg, hc.headers)
   }
 
   def formatDebug(msg: String, headers: SeqOfHeader): String = {
@@ -54,10 +53,9 @@ object LoggingHelper {
   private def format(headers: SeqOfHeader, maybeIds: MaybeIds = None): String = {
 
     lazy val maybeClientId: Option[String] = findHeaderValue("X-Client-ID", headers)
-    // Note this will be present when strategic API platform solution is in place
     lazy val maybeFieldsIdFromHeader: Option[String] = findHeaderValue("api-subscription-fields-id", headers)
-
     lazy val maybeFieldsIdFromHeaderOrIds = maybeFieldsIdFromHeader.orElse(maybeIds.map(ids => ids.fieldsId.value))
+
     maybeClientId.fold("")(appId => s"[clientId=$appId]") +
       maybeFieldsIdFromHeaderOrIds.fold("")(fieldsId => s"[fieldsId=$fieldsId]") +
       maybeIds.fold("")(ids => s"[conversationId=${ids.conversationId.value }]")

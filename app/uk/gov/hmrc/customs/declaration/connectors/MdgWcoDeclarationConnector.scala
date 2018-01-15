@@ -63,7 +63,6 @@ class MdgWcoDeclarationConnector @Inject()(http: WSHttp,
   }
 
   private def post(xml: NodeSeq, url: String)(implicit hc: HeaderCarrier) = {
-    logger.debug(s"Posting wco declaration submission. url=$url", payload = xml.toString)
 
     http.POSTString[HttpResponse](url, xml.toString())
       .recoverWith {
