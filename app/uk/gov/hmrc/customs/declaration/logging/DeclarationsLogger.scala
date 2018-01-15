@@ -31,7 +31,7 @@ class DeclarationsLogger @Inject()(logger: CdsLogger) {
   def info(s: => String)(implicit hc: HeaderCarrier): Unit = logger.info(formatInfo(s))
   def info(s: => String, ids: => Ids)(implicit hc: HeaderCarrier): Unit = logger.info(formatInfo(s, Some(ids)))
   def warn(s: => String)(implicit hc: HeaderCarrier): Unit = logger.warn(formatWarn(s))
-  def error(s: => String)(implicit hc: HeaderCarrier): Unit = logger.error(formatError(s))
+  def error(s: => String, ids: => Ids)(implicit hc: HeaderCarrier): Unit = logger.error(formatError(s, ids))
   def errorWithoutHeaderCarrier(s: => String): Unit = logger.error(s)
 
 }

@@ -52,7 +52,6 @@ class ApiSubscriptionFieldsConnector @Inject()(http: WSHttp,
       }
       .recoverWith {
         case e: Throwable =>
-          logger.error(s"Call to subscription information service failed. url=$url")
           Future.failed(e)
       }
   }

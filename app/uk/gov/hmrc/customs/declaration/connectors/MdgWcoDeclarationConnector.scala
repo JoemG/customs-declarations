@@ -70,7 +70,6 @@ class MdgWcoDeclarationConnector @Inject()(http: WSHttp,
       }
       .recoverWith {
         case e: Throwable =>
-          logger.error(s"Call to wco declaration submission failed. url=$url")
           Future.failed(e)
       }
   }
