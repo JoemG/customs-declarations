@@ -188,7 +188,6 @@ class MdgWcoDeclarationConnectorSpec extends UnitSpec with MockitoSugar with Bef
     eventually {
       PassByNameVerifier(mockDeclarationsLogger, "error")
         .withByNameParam[String](s"Call to wco declaration submission failed. url=${v1Config.url}")
-        .withByNameParam[Throwable](caught)
         .withAnyHeaderCarrierParam
         .verify()
 

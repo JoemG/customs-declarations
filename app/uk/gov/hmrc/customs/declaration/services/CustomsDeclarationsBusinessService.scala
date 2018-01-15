@@ -36,12 +36,10 @@ class CustomsDeclarationsBusinessService @Inject()(logger: DeclarationsLogger,
   type ValidationResult = Either[ErrorResponse, Unit]
 
   def authorisedCspSubmission(xml: NodeSeq)(implicit hc: HeaderCarrier, ver: RequestedVersion): Future[ProcessingResult] = {
-    logger.debug(s"authorisedCspSubmission xml=\n$xml")
     sendIfValid(xml)
   }
 
   def authorisedNonCspSubmission(xml: NodeSeq)(implicit hc: HeaderCarrier, ver: RequestedVersion): Future[ProcessingResult] = {
-    logger.debug(s"authorisedNonCspSubmission xml=\n$xml")
     sendIfValid(xml)
   }
 

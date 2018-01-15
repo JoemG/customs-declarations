@@ -75,13 +75,13 @@ class CustomsDeclarationsController @Inject()(logger: DeclarationsLogger,
   def submit(): Action[AnyContent] = validateHeaders().async(bodyParser = xmlOrEmptyBody) {
     implicit request =>
 
-      logger.debug("submit", request.headers.headers)
-      logger.debug("entered submit controller")
+      logger.debug("Request received", payload = request.body.toString)
+
       lazy val maybeAcceptHeader = request.headers.get(ACCEPT)
       request.body.asXml match {
         case Some(xml) =>
           requestedVersionService.getVersionByAcceptHeader(maybeAcceptHeader).fold {
-            logger.error(s"Requested version of Declarations API could not be resolved from Accept header: $maybeAcceptHeader")
+            logger.error("Requested version is not valid. Processing failed.")
             Future.successful(ErrorResponseInvalidVersionRequested.XmlResult)
           } {
             implicit version =>
@@ -98,37 +98,31 @@ class CustomsDeclarationsController @Inject()(logger: DeclarationsLogger,
     (authoriseCspSubmission(xml) orElseIfInsufficientEnrolments authoriseNonCspSubmission(xml) orElse unauthorised)
       .map {
         case Right(ids) =>
-          logger.info("exiting processXmlPayload", ids)
+          logger.info("Request processed successfully", ids)
           NoContent.as(MimeTypes.XML).withHeaders("X-Conversation-ID" -> ids.conversationId.value)
         case Left(errorResponse) =>
-          val msg = "Customs declaration submission failed."
-          logger.debug(s"$msg error processing payload. HttpStatusCode=${errorResponse.httpStatusCode} Error=${errorResponse.message}")
-          logger.error(msg)
+          logger.error("Authorisation failed.")
           errorResponse.XmlResult
       }
       .recoverWith {
         case NonFatal(e) =>
-          logger.error(s"Customs declaration submission failed. error=${e.getMessage}", e)
+          logger.error("Customs declaration submission failed.")
           Future.successful(ErrorResponse.ErrorInternalServerError.XmlResult)
       }
   }
 
   private def authoriseCspSubmission(xml: NodeSeq)(implicit hc: HeaderCarrier, ver: RequestedVersion): Future[ProcessingResult] = {
     authorised(Enrolment(apiScopeKey) and AuthProviders(PrivilegedApplication)) {
-      logger.info("Processing an authorised CSP submission.")
       customsDeclarationsBusinessService.authorisedCspSubmission(xml)
     }
   }
 
   private def authoriseNonCspSubmission(xml: NodeSeq)(implicit hc: HeaderCarrier, ver: RequestedVersion): Future[ProcessingResult] = {
-    logger.info("Authorising a non-CSP request.")
     authorised(Enrolment(customsEnrolmentName) and AuthProviders(GovernmentGateway)).retrieve(Retrievals.authorisedEnrolments) {
       enrolments =>
         val maybeEori = findEoriInCustomsEnrolment(enrolments, hc.authorization)
-        logger.debug(s"EORI from Customs enrolment for non-CSP request=$maybeEori")
         maybeEori match {
           case Some(_) =>
-            logger.info("Processing an authorised non-CSP submission.")
             customsDeclarationsBusinessService.authorisedNonCspSubmission(xml)
 
           case _ => Future.successful(Left(ErrorResponseEoriNotFoundInCustomsEnrolment))
@@ -148,8 +142,6 @@ class CustomsDeclarationsController @Inject()(logger: DeclarationsLogger,
   }
 
   private def unauthorised(authException: AuthorisationException)(implicit hc: HeaderCarrier): Future[Left[ErrorResponse, Ids]] = {
-    val authorisationValue = hc.authorization.map(_.value).getOrElse("")
-    logger.error(s"Unauthorized call with Authorization='$authorisationValue' . error=${authException.getMessage}", authException)
     Future.successful(Left(ErrorResponseUnauthorisedGeneral))
   }
 

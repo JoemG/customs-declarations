@@ -126,7 +126,6 @@ class ApiSubscriptionFieldsConnectorSpec extends UnitSpec
     eventually {
       PassByNameVerifier(mockDeclarationsLogger, "error")
         .withByNameParam[String](s"Call to subscription information service failed. url=$expectedUrl")
-        .withByNameParam[Throwable](caught)
         .withAnyHeaderCarrierParam()
         .verify()
     }

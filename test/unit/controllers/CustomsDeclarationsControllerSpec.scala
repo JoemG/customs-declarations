@@ -174,7 +174,7 @@ class CustomsDeclarationsControllerSpec extends UnitSpec with Matchers with Mock
       testSubmitResult(ValidRequest) { result =>
         await(result) shouldBe errorResultInvalidVersionRequested
         PassByNameVerifier(mockDeclarationsLogger, "error")
-          .withByNameParam[String](s"Requested version of Declarations API could not be resolved from Accept header: Some(application/vnd.hmrc.2.0+xml)")
+          .withByNameParam[String](s"Requested version is not valid. Processing failed.")
           .withAnyHeaderCarrierParam
           .verify()
       }
@@ -188,7 +188,7 @@ class CustomsDeclarationsControllerSpec extends UnitSpec with Matchers with Mock
       testSubmitResult(ValidRequest) { result =>
         await(result) shouldBe errorResultInvalidVersionRequested
         PassByNameVerifier(mockDeclarationsLogger, "error")
-          .withByNameParam[String](s"Requested version of Declarations API could not be resolved from Accept header: Some(application/vnd.hmrc.2.0+xml)")
+          .withByNameParam[String](s"Requested version is not valid. Processing failed.")
           .withAnyHeaderCarrierParam
           .verify()
 
