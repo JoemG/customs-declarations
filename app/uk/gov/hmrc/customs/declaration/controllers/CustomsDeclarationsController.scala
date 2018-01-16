@@ -110,7 +110,7 @@ class CustomsDeclarationsController @Inject()(logger: DeclarationsLogger,
           errorResponse.XmlResult
       }
       .recoverWith {
-        case NonFatal(e) =>
+        case NonFatal(_) =>
           logger.error("Customs declaration submission failed.", ids)
           Future.successful(ErrorResponse.ErrorInternalServerError.XmlResult)
       }

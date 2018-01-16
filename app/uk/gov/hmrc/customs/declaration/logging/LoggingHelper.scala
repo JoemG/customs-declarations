@@ -54,7 +54,7 @@ object LoggingHelper {
 
     lazy val maybeClientId: Option[String] = findHeaderValue("X-Client-ID", headers)
     lazy val maybeFieldsIdFromHeader: Option[String] = findHeaderValue("api-subscription-fields-id", headers)
-    lazy val maybeFieldsIdFromHeaderOrIds = maybeFieldsIdFromHeader.orElse(maybeIds.map(ids => ids.maybeFieldsId.getOrElse(throw new IllegalStateException("should have been defined by now")).value))
+    lazy val maybeFieldsIdFromHeaderOrIds = maybeFieldsIdFromHeader.orElse(maybeIds.flatMap(ids => ids.maybeFieldsId.map(_.value)))
 
     maybeClientId.fold("")(appId => s"[clientId=$appId]") +
       maybeFieldsIdFromHeaderOrIds.fold("")(fieldsId => s"[fieldsId=$fieldsId]") +
